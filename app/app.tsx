@@ -38,11 +38,11 @@ function App() {
   // otherwise, we're ready to render the app
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-          <ErrorBoundary catchErrors={"always"}>
-            <AppNavigator />
-          </ErrorBoundary>
-        </SafeAreaProvider>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <ErrorBoundary catchErrors={"always"}>
+          <AppNavigator />
+        </ErrorBoundary>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   )
 }

@@ -39,7 +39,7 @@ export const ViewScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   const insets = useSafeAreaInsets()
 
   return (
-    <View testID="ListScreen" style={FULL}>
+    <View style={FULL}>
       <Screen style={[CONTAINER, { paddingBottom: insets.bottom }]} preset="auto" unsafe>
         <View style={{ paddingVertical: 12 }}>
           <Text style={H1}>{item.title}</Text>

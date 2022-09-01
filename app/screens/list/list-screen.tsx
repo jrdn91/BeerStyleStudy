@@ -1,22 +1,22 @@
+import BeerStyles, { BeerCategory, BeerStyle } from "2021-beer-styles"
+import BottomSheet from '@gorhom/bottom-sheet'
 import { StackScreenProps } from "@react-navigation/stack"
 import { FlashList } from "@shopify/flash-list"
+import Fuse from 'fuse.js'
 import { omit, orderBy } from "lodash"
 import React, { FC, useMemo, useRef, useState } from "react"
 import { Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import Modal from "react-native-modal"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import Icon from 'react-native-vector-icons/Feather'
-import Fuse from 'fuse.js'
 import { useDebouncedCallback } from "use-debounce"
 import {
-  Button,
   Screen,
   Text
 } from "../../components"
 import { NavigatorParamList } from "../../navigators"
 import { color, radii, shadows, typography } from "../../theme"
 import Item from "./Item"
-import BeerStyles, { BeerCategory, BeerStyle } from "2021-beer-styles"
 
 // import BottomSheet from '@gorhom/bottom-sheet';
 
@@ -157,9 +157,10 @@ const ModalContent = ({ description, onClose }: { description: string, onClose: 
 
 interface ListHeaderProps {
   onChange: (text: string) => void,
+  onSortPress: () => void
 }
 
-const ListHeader = ({ onChange }: ListHeaderProps) => {
+const ListHeader = ({ onChange, onSortPress }: ListHeaderProps) => {
   const insets = useSafeAreaInsets()
 
   const [internalState, setInternalState] = useState<string>("")
@@ -190,7 +191,7 @@ const ListHeader = ({ onChange }: ListHeaderProps) => {
           2021 BJCP Styles
         </Text>
         <View style={{ flex: 1, alignItems: "flex-end", paddingRight: 8 }}>
-          {/* <Pressable ><Icon name="shuffle" size={18} color={color.palette.blue} /></Pressable> */}
+          <Pressable onPress={onSortPress}><Icon name="shuffle" size={18} color={color.palette.blue} /></Pressable>
         </View>
       </View>
       <View style={{ width: "100%" }}>
@@ -212,7 +213,13 @@ const ListHeader = ({ onChange }: ListHeaderProps) => {
 }
 
 export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ navigation }) => {
-  // const bottomSheetRef = useRef<BottomSheet>(null);
+  // bottom sheet stuff
+  const bottomSheetRef = useRef<BottomSheet>(null)
+  const snapPoints = ['25%', '50%']
+  const handleSheetChanges = (index: number) => {
+    console.log('handleSheetChanges', index);
+  }
+
   const parentRef = useRef(null)
   const fuseRefs = useRef<{[key: string]: Fuse<BeerStyle>}>(beerData.reduce((prev, next) => ({ ...prev, [next.title]: new Fuse(next.styles, styleSearchOptions) }), {}))
 
@@ -222,7 +229,6 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [searchText, setSearchText] = useState("")
 
-  const snapPoints = ['25%', '50%']
 
   // useEffect(() => {
   //   navigation.setOptions({
@@ -242,8 +248,6 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   const handleNavigateToView = (item: object) => {
     navigation.push("view", { item })
   }
-
-  console.log("fuseRefs", fuseRefs)
 
   const searchedStyles = useMemo<BeerCategory[]>(() => {
     if (searchText) {
@@ -278,47 +282,64 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   })
   .filter((item) => item !== null) as number[];
 
+  const handleOpenBottomSheet = () => {
+    bottomSheetRef.current?.expand()
+  }
+
   return (
-    <View testID="ListScreen" style={FULL} ref={parentRef}>
-      <Screen style={CONTAINER} preset="fixed" unsafe>
-        <ListHeader onChange={setSearchText} />
-        <FlashList
-          contentContainerStyle={LIST}
-          data={sectionedBeerData}
-          renderItem={({ item }) => {
-            if (item.type === "category") {
-              // Rendering header
-              return <Section item={item} onOpenModal={handleOpenModal} />
-            } else {
-              // Render item
-              return <Pressable onPress={() => handleNavigateToView(item)}><Item item={item} /></Pressable>
-            }
-          }}
-          stickyHeaderIndices={stickyHeaderIndices}
-          getItemType={(item) => {
-            // To achieve better performance, specify the type based on the item
-            return item.type === "category" ? "sectionHeader" : "row";
-          }}
-          estimatedItemSize={100}
-          ListFooterComponentStyle={{
-            height: insets.bottom
-          }}
-        />
-        <Modal isVisible={isModalVisible}>
-          <SafeAreaView>
-            <ModalContent description={modalContent} onClose={() => setIsModalVisible(false)} />
-          </SafeAreaView>
-        </Modal>
-        {/* <BottomSheet
-          ref={bottomSheetRef}
-          index={1}
-          snapPoints={snapPoints}
-        >
-          <View style={{ flex: 1 }}>
-            <Text>Awesome 🎉</Text>
-          </View>
-        </BottomSheet> */}
-      </Screen>
-    </View>
+      <>
+      <View style={FULL} ref={parentRef}>
+        <Screen style={CONTAINER} preset="fixed" unsafe>
+          <ListHeader onChange={setSearchText} onSortPress={handleOpenBottomSheet} />
+          <FlashList
+            contentContainerStyle={LIST}
+            data={sectionedBeerData}
+            renderItem={({ item }) => {
+              if (item.type === "category") {
+                // Rendering header
+                return <Section item={item} onOpenModal={handleOpenModal} />
+              } else {
+                // Render item
+                return <Pressable onPress={() => handleNavigateToView(item)}><Item item={item} /></Pressable>
+              }
+            }}
+            stickyHeaderIndices={stickyHeaderIndices}
+            getItemType={(item) => {
+              // To achieve better performance, specify the type based on the item
+              return item.type === "category" ? "sectionHeader" : "row";
+            }}
+            estimatedItemSize={100}
+            ListFooterComponentStyle={{
+              height: insets.bottom
+            }}
+          />
+          <Modal isVisible={isModalVisible}>
+            <SafeAreaView>
+              <ModalContent description={modalContent} onClose={() => setIsModalVisible(false)} />
+            </SafeAreaView>
+          </Modal>
+          {/* <BottomSheet
+            ref={bottomSheetRef}
+            index={1}
+            snapPoints={snapPoints}
+          >
+            <View style={{ flex: 1 }}>
+              <Text>Awesome 🎉</Text>
+            </View>
+          </BottomSheet> */}
+        </Screen>
+      </View>
+      <BottomSheet
+      ref={bottomSheetRef}
+      index={-1}
+      snapPoints={snapPoints}
+      onChange={handleSheetChanges}
+      enablePanDownToClose
+    >
+      <View style={{ flex: 1, alignItems: "center" }}>
+        <Text>Awesome 🎉</Text>
+      </View>
+    </BottomSheet>
+    </>
   )
 }

@@ -4,6 +4,7 @@
  *
  * @format
  */
+const defaultAssetExts = require("metro-config/src/defaults/defaults").assetExts
 
 module.exports = {
   transformer: {
@@ -14,4 +15,7 @@ module.exports = {
       },
     }),
   },
-};
+  resolver: {
+    assetExts: [...defaultAssetExts, "cjs", "mjs"],
+  },
+}
