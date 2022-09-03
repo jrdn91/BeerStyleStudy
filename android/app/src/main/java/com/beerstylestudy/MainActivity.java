@@ -1,5 +1,6 @@
+package com.BeerStyleStudy;
+
 import android.os.Bundle;
-package com.beerstylestudy;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
