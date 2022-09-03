@@ -1,6 +1,6 @@
 export const shadows = {
   card: {
-    elevation: 2,
+    elevation: 6,
     shadowColor: '#0000001f',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
