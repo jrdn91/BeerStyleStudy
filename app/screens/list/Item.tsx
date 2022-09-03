@@ -9,7 +9,7 @@ import { TextStyle, View, ViewStyle } from 'react-native'
 const TEXT: TextStyle = {
   color: color.text,
   fontFamily: typography.primary,
-  marginBottom: 3
+  marginBottom: 3,
 }
 const ITEM: ViewStyle = {
   backgroundColor: color.palette.white,

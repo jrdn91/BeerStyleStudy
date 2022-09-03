@@ -182,7 +182,7 @@ const ListHeader = ({ onChange, onSortPress }: ListHeaderProps) => {
   }
 
   return (
-    <View style={{ width: "100%", paddingTop: insets.top, display: "flex", alignItems: "center", paddingBottom: 16, paddingHorizontal: 16 }}>
+    <View style={{ width: "100%", paddingTop: insets.top, display: "flex", alignItems: "center", paddingBottom: 16, paddingHorizontal: 16, backgroundColor: "#fff", zIndex: 1 }}>
       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
         <View style={{ flex: 1, alignItems: "flex-start", paddingLeft: 8 }}>
           {/* <Pressable><Icon name="filter" size={18} color={color.palette.blue} /></Pressable> */}

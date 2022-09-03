@@ -4,10 +4,9 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import React from "react"
-import { useColorScheme } from "react-native"
 import { ListScreen, ViewScreen } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigation-utilities"
 
@@ -40,12 +39,16 @@ const AppStack = () => {
         headerTitleStyle: {
           fontSize: 16,
           fontWeight: "bold",
-        }
+        },
+        headerStyle: {
+          backgroundColor: "#fff"
+        },
+        // headerBackground: () => <View style={{ flex: 1, backgroundColor: "red", zIndex: 0 }} />
       }}
     >
       <Stack.Screen name="list" component={ListScreen} options={{
         title: "",
-        headerShown: true,
+        headerShown: false,
         headerTransparent: true,
       }} />
       <Stack.Screen name="view" component={ViewScreen} options={(props) => {
@@ -62,12 +65,11 @@ const AppStack = () => {
 interface NavigationProps extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = (props: NavigationProps) => {
-  const colorScheme = useColorScheme()
   useBackButtonHandler(canExit)
   return (
     <NavigationContainer
       ref={navigationRef}
-      theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+      theme={DefaultTheme}
       {...props}
     >
       <AppStack />
