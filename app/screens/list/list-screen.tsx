@@ -51,7 +51,7 @@ export const styleNames = beerData.map((cat) => cat.styles.map((style) => {
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
-  backgroundColor: color.palette.white,
+  backgroundColor: color.background,
 }
 const LIST: ViewStyle = {
   backgroundColor: color.transparent
