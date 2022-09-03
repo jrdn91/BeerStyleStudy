@@ -11,6 +11,8 @@ import {
 import PropertySection from "../../components/PropertySection"
 import { NavigatorParamList } from "../../navigators"
 import { color, typography } from "../../theme"
+import VitalStatistics from "app/components/VitalStatistics"
+import { BeerStyle } from "2021-beer-styles"
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
@@ -31,7 +33,9 @@ const SRM_BAR: ViewStyle = {
 }
 
 export const ViewScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ navigation, route }) => {
-  const item = route.params.item
+  const item = route.params?.item as BeerStyle
+
+  console.log(item)
 
   const firstColor = SRMColorMap.get(item.properties.vitalStatistics.SRM[0]+"")
   const secondColor = SRMColorMap.get(item.properties.vitalStatistics.SRM[1]+"")
@@ -46,6 +50,7 @@ export const ViewScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
           <LinearGradient locations={[0, 1]} start={{ x: 0, y: 0 }} colors={[`rgb(${firstColor})`, `rgb(${secondColor})`]} style={SRM_BAR} />
         </View>
         <View>
+          <VitalStatistics stats={item.properties.vitalStatistics} />
           {Object.keys(item.properties).map((key, idx) => typeof item.properties[key] === "string" ? <PropertySection key={idx} title={key} content={item.properties[key]} /> : null)}
         </View>
       </Screen>
