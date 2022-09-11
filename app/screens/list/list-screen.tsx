@@ -1,16 +1,19 @@
 import BeerStyles, { BeerCategory, BeerStyle } from "2021-beer-styles"
-import BottomSheet from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet'
 import { StackScreenProps } from "@react-navigation/stack"
 import { FlashList } from "@shopify/flash-list"
+import { palette } from "app/theme/palette"
 import Fuse from 'fuse.js'
-import { omit, orderBy } from "lodash"
+import { flatten, map, omit, orderBy, property } from "lodash"
 import React, { FC, useMemo, useRef, useState } from "react"
 import { Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import Modal from "react-native-modal"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import Icon from 'react-native-vector-icons/Feather'
+import { Colors } from "react-native/Libraries/NewAppScreen"
 import { useDebouncedCallback } from "use-debounce"
 import {
+  Button,
   Screen,
   Text
 } from "../../components"
@@ -157,17 +160,16 @@ const ModalContent = ({ description, onClose }: { description: string, onClose: 
 
 interface ListHeaderProps {
   onChange: (text: string) => void,
-  onSortPress: () => void
+  onSortPress: () => void,
+  hasActiveSort: boolean
 }
 
-const ListHeader = ({ onChange, onSortPress }: ListHeaderProps) => {
+const ListHeader = ({ onChange, onSortPress, hasActiveSort }: ListHeaderProps) => {
   const insets = useSafeAreaInsets()
 
   const [internalState, setInternalState] = useState<string>("")
 
   const debounced = useDebouncedCallback((value: string) => {
-    console.log(value)
-    // setInternalState(value)
     onChange(value)
   },350);
 
@@ -191,7 +193,7 @@ const ListHeader = ({ onChange, onSortPress }: ListHeaderProps) => {
           2021 BJCP Styles
         </Text>
         <View style={{ flex: 1, alignItems: "flex-end", paddingRight: 8 }}>
-          <Pressable onPress={onSortPress}><Icon name="shuffle" size={18} color={color.palette.blue} /></Pressable>
+          <Pressable onPress={onSortPress}><Icon name="shuffle" size={18} color={hasActiveSort ? color.palette.blue : color.text} /></Pressable>
         </View>
       </View>
       <View style={{ width: "100%" }}>
@@ -215,10 +217,8 @@ const ListHeader = ({ onChange, onSortPress }: ListHeaderProps) => {
 export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ navigation }) => {
   // bottom sheet stuff
   const bottomSheetRef = useRef<BottomSheet>(null)
+  const listRef = useRef<FlashList<BeerStyle>>(null)
   const snapPoints = ['25%', '50%']
-  const handleSheetChanges = (index: number) => {
-    console.log('handleSheetChanges', index);
-  }
 
   const parentRef = useRef(null)
   const fuseRefs = useRef<{[key: string]: Fuse<BeerStyle>}>(beerData.reduce((prev, next) => ({ ...prev, [next.title]: new Fuse(next.styles, styleSearchOptions) }), {}))
@@ -228,6 +228,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   const [modalContent, setModalContent] = useState("")
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [searchText, setSearchText] = useState("")
+  const [sortOption, setSortOption] = useState<string | null>(null)
 
 
   // useEffect(() => {
@@ -245,8 +246,8 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
     setIsModalVisible(true)
   }
 
-  const handleNavigateToView = (item: object) => {
-    navigation.push("view", { item })
+  const handleNavigateToView = (item: BeerStyle) => {
+    navigation.push("view", item)
   }
 
   const searchedStyles = useMemo<BeerCategory[]>(() => {
@@ -263,7 +264,12 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
     }
   }, [searchText])
 
-  console.log("searchedStyles", searchedStyles)
+  const sortedStyles = useMemo<BeerCategory[]>(() => {
+    if (sortOption) {
+      return orderBy(flatten(map(searchedStyles, "styles")), [property(`properties.vitalStatistics.${sortOption}[0]`), property(`properties.vitalStatistics.${sortOption}[0]`)], ["asc", "asc"])
+    }
+    return null
+  }, [searchedStyles, sortOption])
 
   const sectionedBeerData: Section[] = searchedStyles.reduce((prev: Section[], category: BeerCategory) => {
     return [...prev, {
@@ -286,14 +292,28 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
     bottomSheetRef.current?.expand()
   }
 
+  const handleSort = (option: string) => {
+    setSortOption(option)
+    bottomSheetRef.current?.close?.()
+    listRef.current?.scrollToIndex?.({
+      index: 0
+    })
+  }
+
+  const handleClearSort = () => {
+    setSortOption(null)
+    bottomSheetRef.current?.close?.()
+  }
+
   return (
       <>
       <View style={FULL} ref={parentRef}>
         <Screen style={CONTAINER} preset="fixed" unsafe>
-          <ListHeader onChange={setSearchText} onSortPress={handleOpenBottomSheet} />
+          <ListHeader onChange={setSearchText} onSortPress={handleOpenBottomSheet} hasActiveSort={sortOption !== null} />
           <FlashList
+            ref={listRef}
             contentContainerStyle={LIST}
-            data={sectionedBeerData}
+            data={sortOption ? sortedStyles : sectionedBeerData}
             renderItem={({ item }) => {
               if (item.type === "category") {
                 // Rendering header
@@ -303,7 +323,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
                 return <Pressable onPress={() => handleNavigateToView(item)}><Item item={item} /></Pressable>
               }
             }}
-            stickyHeaderIndices={stickyHeaderIndices}
+            stickyHeaderIndices={sortOption ? undefined : stickyHeaderIndices}
             getItemType={(item) => {
               // To achieve better performance, specify the type based on the item
               return item.type === "category" ? "sectionHeader" : "row";
@@ -330,14 +350,26 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
         </Screen>
       </View>
       <BottomSheet
-      ref={bottomSheetRef}
-      index={-1}
-      snapPoints={snapPoints}
-      onChange={handleSheetChanges}
-      enablePanDownToClose
-    >
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        backdropComponent={BottomSheetBackdrop}
+      >
       <View style={{ flex: 1, alignItems: "center" }}>
-        <Text>Awesome 🎉</Text>
+        <View style={{ width: "100%", paddingLeft: 12, paddingRight: 12, paddingTop: 12 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={{ marginBottom: 12 }}>Sort Options</Text>
+            {sortOption && <Pressable onPress={handleClearSort}><Text style={{ color: color.palette.blue }}>Clear</Text></Pressable>}
+          </View>
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Button onPress={() => handleSort("SRM")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>SRM</Text></Button>
+            <Button onPress={() => handleSort("ABV")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>ABV</Text></Button>
+            <Button onPress={() => handleSort("IBU")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>IBU</Text></Button>
+            <Button onPress={() => handleSort("OG")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>OG</Text></Button>
+            <Button onPress={() => handleSort("FG")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>FG</Text></Button>
+          </View>
+        </View>
       </View>
     </BottomSheet>
     </>

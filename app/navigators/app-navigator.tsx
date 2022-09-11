@@ -8,6 +8,7 @@ import { BeerStyle } from "2021-beer-styles"
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import React from "react"
+import { View } from "react-native"
 import { ListScreen, ViewScreen } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigation-utilities"
 
@@ -55,7 +56,7 @@ const AppStack = () => {
       <Stack.Screen name="view" component={ViewScreen} options={(props) => {
         return {
           headerBackTitle: "",
-          title: props.route.params?.item?.title || ""
+          title: props.route.params?.title || "",
         }
       }} />
       {/** 🔥 Your screens go here */}
