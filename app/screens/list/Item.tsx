@@ -1,10 +1,11 @@
-
+import { BeerStyle, VitalStatistics, VitalStatisticsKeys } from "2021-beer-styles"
 import { Text } from '@/components'
 import { SRMColorMap } from '@/srmRgbValues'
 import { color, radii, shadows, typography } from '@/theme'
 import LinearGradient from 'react-native-linear-gradient';
 import React from 'react'
 import { TextStyle, View, ViewStyle } from 'react-native'
+import Icon from 'react-native-vector-icons/Feather'
 
 const TEXT: TextStyle = {
   color: color.text,
@@ -48,9 +49,26 @@ const SRM_BAR: ViewStyle = {
   marginTop: 5
 }
 
-const Item = ({ item }) => {
+const SRM_TEXT_LINE: ViewStyle = {
+  flexDirection: "row",
+  alignItems: "baseline"
+}
+
+interface ItemProps {
+  item: BeerStyle
+  previousStats: VitalStatistics | null
+  sortStat: VitalStatisticsKeys | null
+}
+
+const Item = ({ item, previousStats, sortStat }: ItemProps) => {
   const firstColor = SRMColorMap.get(item.properties.vitalStatistics.SRM[0]+"")
   const secondColor = SRMColorMap.get(item.properties.vitalStatistics.SRM[1]+"")
+
+  console.log("previousStats", previousStats)
+  console.log("sortStat", sortStat)
+
+  console.log(previousStats?.[sortStat]?.[0] > item.properties.vitalStatistics.SRM[0])
+
   return (
     <View style={ITEM}>
       <Text style={TEXT}>{item.title}</Text>
@@ -64,9 +82,29 @@ const Item = ({ item }) => {
       </View>
       <View>
         <View style={SRM_TEXT_VIEW}>
-          <Text style={SRM_TEXT}>{item.properties.vitalStatistics.SRM[0]}</Text>
+          <View style={SRM_TEXT_LINE}>
+            <Text style={SRM_TEXT}>{item.properties.vitalStatistics.SRM[0]}</Text>
+            {sortStat !== null && (
+              <>
+                <Icon name={previousStats?.[sortStat]?.[0] > item.properties.vitalStatistics.SRM[0] ? "chevron-down" : "chevron-up"} size={12} color={previousStats?.[sortStat]?.[0] > item.properties.vitalStatistics.SRM[0] ? color.palette.angry : color.palette.success} />
+                <Text style={{ color: previousStats?.[sortStat]?.[0] > item.properties.vitalStatistics.SRM[0] ? color.palette.angry : color.palette.success, fontSize: 12 }}>
+                  {Math.abs(item.properties.vitalStatistics.SRM[0] - previousStats?.[sortStat]?.[0])}
+                </Text>
+              </>
+            )}
+          </View>
           <Text style={SRM_TEXT}>SRM</Text>
-          <Text style={SRM_TEXT}>{item.properties.vitalStatistics.SRM[1]}</Text>
+          <View style={SRM_TEXT_LINE}>
+          {sortStat !== null && (
+              <>
+                <Icon name={previousStats?.[sortStat]?.[1] > item.properties.vitalStatistics.SRM[1] ? "chevron-down" : "chevron-up"} size={12} color={previousStats?.[sortStat]?.[1] > item.properties.vitalStatistics.SRM[1] ? color.palette.angry : color.palette.success} />
+                <Text style={{ color: previousStats?.[sortStat]?.[1] > item.properties.vitalStatistics.SRM[1] ? color.palette.angry : color.palette.success, fontSize: 12 }}>
+                  {Math.abs(item.properties.vitalStatistics.SRM[1] - previousStats?.[sortStat]?.[1])}
+                </Text>
+              </>
+            )}
+            <Text style={SRM_TEXT}>{item.properties.vitalStatistics.SRM[1]}</Text>
+          </View>
         </View>
         <LinearGradient locations={[0, 1]} start={{ x: 0, y: 0 }} colors={[`rgb(${firstColor})`, `rgb(${secondColor})`]} style={SRM_BAR} />
       </View>

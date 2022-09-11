@@ -1,4 +1,4 @@
-import BeerStyles, { BeerCategory, BeerStyle } from "2021-beer-styles"
+import BeerStyles, { BeerCategory, BeerStyle, VitalStatistics, VitalStatisticsKeys } from "2021-beer-styles"
 import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet'
 import { StackScreenProps } from "@react-navigation/stack"
 import { FlashList } from "@shopify/flash-list"
@@ -228,7 +228,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   const [modalContent, setModalContent] = useState("")
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [searchText, setSearchText] = useState("")
-  const [sortOption, setSortOption] = useState<string | null>(null)
+  const [sortOption, setSortOption] = useState<VitalStatisticsKeys | null>(null)
 
 
   // useEffect(() => {
@@ -314,13 +314,21 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
             ref={listRef}
             contentContainerStyle={LIST}
             data={sortOption ? sortedStyles : sectionedBeerData}
-            renderItem={({ item }) => {
+            renderItem={({ item, index }) => {
               if (item.type === "category") {
                 // Rendering header
                 return <Section item={item} onOpenModal={handleOpenModal} />
               } else {
                 // Render item
-                return <Pressable onPress={() => handleNavigateToView(item)}><Item item={item} /></Pressable>
+                return (
+                  <Pressable onPress={() => handleNavigateToView(item)}>
+                    <Item
+                      item={item}
+                      sortStat={sortOption}
+                      previousStats={index > 0 && sortOption !== null ? sortedStyles?.[index - 1]?.properties?.vitalStatistics : null}
+                    />
+                  </Pressable>
+                )
               }
             }}
             stickyHeaderIndices={sortOption ? undefined : stickyHeaderIndices}
