@@ -2,6 +2,7 @@ import BeerStyles, { BeerCategory, BeerStyle, VitalStatistics, VitalStatisticsKe
 import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet'
 import { StackScreenProps } from "@react-navigation/stack"
 import { FlashList } from "@shopify/flash-list"
+import ListHeader from "app/components/list/ListHeader"
 import { palette } from "app/theme/palette"
 import Fuse from 'fuse.js'
 import { flatten, map, omit, orderBy, property } from "lodash"
@@ -80,27 +81,6 @@ const MODAL: ViewStyle = {
   display: "flex",
   paddingVertical: 8
 }
-const INPUT: TextStyle = {
-  borderWidth: 1,
-  borderColor: color.palette.offWhite,
-  borderRadius: radii.full,
-  width: "100%",
-  height: 36,
-  paddingHorizontal: 12,
-  zIndex: 0
-}
-
-const CLEAR_ICON_PRESSABLE: ViewStyle = {
-  height: 36,
-  width: 36,
-  position: "absolute",
-  right: 0,
-  top: 0,
-  zIndex: 1,
-  alignItems: "center",
-  justifyContent: "center"
-}
-
 interface Contact {
   firstName: string;
   lastName: string;
@@ -153,62 +133,6 @@ const ModalContent = ({ description, onClose }: { description: string, onClose: 
       </View>
       <View style={{ padding: 12 }}>
         <Text style={{ ...TEXT, marginTop: 8 }}>{description}</Text>
-      </View>
-    </View>
-  )
-}
-
-interface ListHeaderProps {
-  onChange: (text: string) => void,
-  onSortPress: () => void,
-  hasActiveSort: boolean
-}
-
-const ListHeader = ({ onChange, onSortPress, hasActiveSort }: ListHeaderProps) => {
-  const insets = useSafeAreaInsets()
-
-  const [internalState, setInternalState] = useState<string>("")
-
-  const debounced = useDebouncedCallback((value: string) => {
-    onChange(value)
-  },350);
-
-  const handleOnChangeText = (text: string) => {
-    setInternalState(text)
-    debounced(text)
-  }
-
-  const handleClear = () => {
-    setInternalState("")
-    onChange("")
-  }
-
-  return (
-    <View style={{ width: "100%", paddingTop: insets.top, display: "flex", alignItems: "center", paddingBottom: 16, paddingHorizontal: 16, backgroundColor: "#fff", zIndex: 1 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
-        <View style={{ flex: 1, alignItems: "flex-start", paddingLeft: 8 }}>
-          {/* <Pressable><Icon name="filter" size={18} color={color.palette.blue} /></Pressable> */}
-        </View>
-        <Text style={{ flex: 0, fontSize: 16, fontWeight: "bold" }}>
-          2021 BJCP Styles
-        </Text>
-        <View style={{ flex: 1, alignItems: "flex-end", paddingRight: 8 }}>
-          <Pressable onPress={onSortPress}><Icon name="shuffle" size={18} color={hasActiveSort ? color.palette.blue : color.text} /></Pressable>
-        </View>
-      </View>
-      <View style={{ width: "100%" }}>
-        <TextInput
-          placeholder="Search"
-          style={INPUT}
-          onChangeText={handleOnChangeText}
-          value={internalState}
-        />
-        {internalState.length > 0 && (
-
-          <Pressable style={CLEAR_ICON_PRESSABLE} onPress={handleClear}>
-            <Icon name="x-circle" size={18} color={color.dim} />
-          </Pressable>
-        )}
       </View>
     </View>
   )
