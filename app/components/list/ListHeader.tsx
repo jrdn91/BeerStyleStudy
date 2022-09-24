@@ -62,7 +62,7 @@ const ListHeader = ({ onChange, onSortPress, hasActiveSort }: ListHeaderProps) =
           2021 BJCP Styles
         </Text>
         <View style={{ flex: 1, alignItems: "flex-end", paddingRight: 8 }}>
-          <Pressable onPress={onSortPress}><Icon name="shuffle" size={18} color={hasActiveSort ? color.palette.blue : color.text} /></Pressable>
+          <Pressable onPress={onSortPress}><Icon name="sliders" size={18} color={hasActiveSort ? color.palette.blue : color.text} /></Pressable>
         </View>
       </View>
       <View style={{ width: "100%" }}>
