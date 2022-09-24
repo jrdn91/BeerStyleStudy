@@ -1,21 +1,17 @@
-import BeerStyles, { BeerCategory, BeerStyle, VitalStatistics, VitalStatisticsKeys } from "2021-beer-styles"
-import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet'
+import BeerStyles, { BeerCategory, BeerStyle, VitalStatisticsKeys } from "2021-beer-styles"
+import BottomSheet from '@gorhom/bottom-sheet'
 import { StackScreenProps } from "@react-navigation/stack"
 import { FlashList } from "@shopify/flash-list"
 import ListHeader from "app/components/list/ListHeader"
 import ListSheet from "app/components/list/ListSheet"
-import { palette } from "app/theme/palette"
 import Fuse from 'fuse.js'
 import { flatten, map, omit, orderBy, property } from "lodash"
 import React, { FC, useMemo, useRef, useState } from "react"
-import { Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { Pressable, TextStyle, View, ViewStyle } from "react-native"
 import Modal from "react-native-modal"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import Icon from 'react-native-vector-icons/Feather'
-import { Colors } from "react-native/Libraries/NewAppScreen"
-import { useDebouncedCallback } from "use-debounce"
 import {
-  Button,
   Screen,
   Text
 } from "../../components"
@@ -272,15 +268,6 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
               <ModalContent description={modalContent} onClose={() => setIsModalVisible(false)} />
             </SafeAreaView>
           </Modal>
-          {/* <BottomSheet
-            ref={bottomSheetRef}
-            index={1}
-            snapPoints={snapPoints}
-          >
-            <View style={{ flex: 1 }}>
-              <Text>Awesome 🎉</Text>
-            </View>
-          </BottomSheet> */}
         </Screen>
       </View>
       <ListSheet
