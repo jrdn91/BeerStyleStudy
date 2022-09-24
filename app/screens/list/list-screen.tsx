@@ -3,6 +3,7 @@ import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet'
 import { StackScreenProps } from "@react-navigation/stack"
 import { FlashList } from "@shopify/flash-list"
 import ListHeader from "app/components/list/ListHeader"
+import ListSheet from "app/components/list/ListSheet"
 import { palette } from "app/theme/palette"
 import Fuse from 'fuse.js'
 import { flatten, map, omit, orderBy, property } from "lodash"
@@ -22,7 +23,9 @@ import { NavigatorParamList } from "../../navigators"
 import { color, radii, shadows, typography } from "../../theme"
 import Item from "./Item"
 
-// import BottomSheet from '@gorhom/bottom-sheet';
+interface CategoryWithType extends BeerCategory {
+  type: "category"
+}
 
 const searchOptions = {
   includeScore: true,
@@ -141,8 +144,7 @@ const ModalContent = ({ description, onClose }: { description: string, onClose: 
 export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ navigation }) => {
   // bottom sheet stuff
   const bottomSheetRef = useRef<BottomSheet>(null)
-  const listRef = useRef<FlashList<BeerStyle>>(null)
-  const snapPoints = ['25%', '50%']
+  const listRef = useRef<FlashList<BeerStyle | CategoryWithType>>(null)
 
   const parentRef = useRef(null)
   const fuseRefs = useRef<{[key: string]: Fuse<BeerStyle>}>(beerData.reduce((prev, next) => ({ ...prev, [next.title]: new Fuse(next.styles, styleSearchOptions) }), {}))
@@ -216,7 +218,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
     bottomSheetRef.current?.expand()
   }
 
-  const handleSort = (option: string) => {
+  const handleSort = (option: VitalStatisticsKeys) => {
     setSortOption(option)
     bottomSheetRef.current?.close?.()
     listRef.current?.scrollToIndex?.({
@@ -281,29 +283,12 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
           </BottomSheet> */}
         </Screen>
       </View>
-      <BottomSheet
+      <ListSheet
         ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        backdropComponent={BottomSheetBackdrop}
-      >
-      <View style={{ flex: 1, alignItems: "center" }}>
-        <View style={{ width: "100%", paddingLeft: 12, paddingRight: 12, paddingTop: 12 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Text style={{ marginBottom: 12 }}>Sort Options</Text>
-            {sortOption && <Pressable onPress={handleClearSort}><Text style={{ color: color.palette.blue }}>Clear</Text></Pressable>}
-          </View>
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Button onPress={() => handleSort("SRM")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>SRM</Text></Button>
-            <Button onPress={() => handleSort("ABV")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>ABV</Text></Button>
-            <Button onPress={() => handleSort("IBU")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>IBU</Text></Button>
-            <Button onPress={() => handleSort("OG")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>OG</Text></Button>
-            <Button onPress={() => handleSort("FG")} style={{ width: 55 }}><Text style={{ color: "#fff" }}>FG</Text></Button>
-          </View>
-        </View>
-      </View>
-    </BottomSheet>
+        activeSort={sortOption !== null}
+        onSort={handleSort}
+        onClearSort={handleClearSort}
+      />
     </>
   )
 }
