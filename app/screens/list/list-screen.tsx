@@ -37,7 +37,7 @@ const styleSearchOptions = {
   threshold: 0.2
 }
 
-const styleRegex = /^(\d+[A-Z]\.|^Specialty\sIPA:|^Historical\sBeer:)\s([A-Za-z\säè]+)/
+const styleRegex = /^(\d+[A-Z]\.|^Specialty\sIPA:|^Historical\sBeer:)\s([A-Za-z\säèö\-\,]+)/
 
 const beerData: BeerCategory[] = BeerStyles as BeerCategory[]
 
