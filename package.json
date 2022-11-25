@@ -7,7 +7,6 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "postinstall": "npx pod-install",
     "postuninstall": "npx pod-install",
     "clean:android": "cd android/ && ./gradlew clean"
   },
@@ -32,6 +31,7 @@
     "react-native-vector-icons": "^9.2.0",
     "react-string-replace": "^1.1.0",
     "react-use": "^17.4.0",
+    "remove-accents": "^0.4.4",
     "use-debounce": "^8.0.2"
   },
   "devDependencies": {
