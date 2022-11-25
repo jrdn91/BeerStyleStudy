@@ -1,10 +1,12 @@
 import React, { forwardRef } from 'react'
-import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet'
 import { Pressable, View } from 'react-native'
 import { Text } from '../text/text'
 import { Button } from '../button/button'
 import { color } from 'app/theme'
 import { VitalStatisticsKeys } from '2021-beer-styles'
+
+const Backdrop = (props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />
 
 interface ListSheetProps {
   activeSort: boolean
@@ -12,7 +14,7 @@ interface ListSheetProps {
   onSort: (option: VitalStatisticsKeys) => void
 }
 
-const snapPoints = ['25%', '50%']
+const snapPoints = ['25%']
 
 const ListSheet = forwardRef<BottomSheet, ListSheetProps>(({ activeSort, onClearSort, onSort }, ref) => {
   return (
@@ -21,7 +23,7 @@ const ListSheet = forwardRef<BottomSheet, ListSheetProps>(({ activeSort, onClear
       index={-1}
       snapPoints={snapPoints}
       enablePanDownToClose
-      backdropComponent={BottomSheetBackdrop}
+      backdropComponent={Backdrop}
     >
       <View style={{ flex: 1, alignItems: "center" }}>
         <View style={{ width: "100%", paddingLeft: 12, paddingRight: 12, paddingTop: 12 }}>
