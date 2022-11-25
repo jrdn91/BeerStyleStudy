@@ -143,7 +143,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   const listRef = useRef<FlashList<BeerStyle | CategoryWithType>>(null)
 
   const parentRef = useRef(null)
-  const fuseRefs = useRef<{[key: string]: Fuse<BeerStyle>}>(beerData.reduce((prev, next) => ({ ...prev, [next.title]: new Fuse(next.styles, styleSearchOptions) }), {}))
+  const fuseRefs = useRef<{ [key: string]: Fuse<BeerStyle> }>(beerData.reduce((prev, next) => ({ ...prev, [next.title]: new Fuse(next.styles, styleSearchOptions) }), {}))
 
   const insets = useSafeAreaInsets()
 
@@ -179,9 +179,10 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
       return orderBy(searchResults, ["score"], ["desc"]).map((result) => {
         const styleFuseRef = fuseRefs.current[result.item.title]
         return {
-        ...result.item,
-        styles: orderBy(styleFuseRef.search(searchText), ["score"], ["desc"]).map((styleResult) => styleResult.item)
-      }})
+          ...result.item,
+          styles: orderBy(styleFuseRef.search(searchText), ["score"], ["desc"]).map((styleResult) => styleResult.item)
+        }
+      })
     } else {
       return beerData
     }
@@ -202,14 +203,14 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   }, [])
 
   const stickyHeaderIndices = sectionedBeerData
-  .map((item, index) => {
-    if (item.type === "category") {
-      return index;
-    } else {
-      return null;
-    }
-  })
-  .filter((item) => item !== null) as number[];
+    .map((item, index) => {
+      if (item.type === "category") {
+        return index;
+      } else {
+        return null;
+      }
+    })
+    .filter((item) => item !== null) as number[];
 
   const handleOpenBottomSheet = () => {
     bottomSheetRef.current?.expand()
@@ -229,7 +230,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   }
 
   return (
-      <>
+    <>
       <View style={FULL} ref={parentRef}>
         <Screen style={CONTAINER} preset="fixed" unsafe>
           <ListHeader onChange={setSearchText} onSortPress={handleOpenBottomSheet} hasActiveSort={sortOption !== null} />
