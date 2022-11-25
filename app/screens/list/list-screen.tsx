@@ -11,6 +11,7 @@ import { Keyboard, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import Modal from "react-native-modal"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import Icon from 'react-native-vector-icons/Feather'
+import removeAccents from "remove-accents"
 import {
   Screen,
   Text
@@ -25,14 +26,14 @@ interface CategoryWithType extends BeerCategory {
 
 const searchOptions = {
   includeScore: true,
-  keys: ['styles.title'],
+  keys: ['styles.searchString'],
   includeMatches: true,
   threshold: 0.2
 }
 
 const styleSearchOptions = {
   includeScore: true,
-  keys: ['title'],
+  keys: ['searchString'],
   includeMatches: true,
   threshold: 0.2
 }
@@ -40,16 +41,33 @@ const styleSearchOptions = {
 const styleRegex = /^(\d+[A-Z]\.|^Specialty\sIPA:|^Historical\sBeer:)\s([A-Za-z\säèö\-\,]+)/
 
 const beerData: BeerCategory[] = BeerStyles as BeerCategory[]
+const beerDataWithSearchString = beerData.map(category => {
+  return {
+    ...category,
+    styles: category.styles.map((style: BeerStyle) => {
+      const match = style.title.match(styleRegex)
+      const nameString = match?.[2]
+      console.log(nameString)
+      return {
+        ...style,
+        searchString: removeAccents(nameString)
+      }
+    })
+  }
+})
+
+console.log(beerDataWithSearchString)
 
 interface Section extends BeerCategory {
   type: string
 }
 
-const fuse = new Fuse(beerData, searchOptions)
+const fuse = new Fuse(beerDataWithSearchString, searchOptions)
 
-export const styleNames = beerData.map((cat) => cat.styles.map((style) => {
+export const styleNames = beerData.map((cat) => cat.styles.map((style: BeerStyle) => {
   const match = style.title.match(styleRegex)
-  return { ...style, nameString: match?.[2] || "" }
+  const nameString = match?.[2]
+  return { ...style, nameString }
 })).flat()
 
 const FULL: ViewStyle = { flex: 1 }
@@ -143,7 +161,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   const listRef = useRef<FlashList<BeerStyle | CategoryWithType>>(null)
 
   const parentRef = useRef(null)
-  const fuseRefs = useRef<{ [key: string]: Fuse<BeerStyle> }>(beerData.reduce((prev, next) => ({ ...prev, [next.title]: new Fuse(next.styles, styleSearchOptions) }), {}))
+  const fuseRefs = useRef<{ [key: string]: Fuse<BeerStyle> }>(beerDataWithSearchString.reduce((prev, next) => ({ ...prev, [next.title]: new Fuse(next.styles, styleSearchOptions) }), {}))
 
   const insets = useSafeAreaInsets()
 
@@ -199,7 +217,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
     return [...prev, {
       ...omit(category, ["styles"]),
       type: "category"
-    }, ...category.styles.map((style) => ({ ...style, type: "style" }))];
+    }, ...category.styles.map((style: BeerStyle) => ({ ...style, type: "style" }))];
   }, [])
 
   const stickyHeaderIndices = sectionedBeerData
