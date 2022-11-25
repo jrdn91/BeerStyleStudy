@@ -7,7 +7,7 @@ import ListSheet from "app/components/list/ListSheet"
 import Fuse from 'fuse.js'
 import { flatten, map, omit, orderBy, property } from "lodash"
 import React, { FC, useMemo, useRef, useState } from "react"
-import { Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { Keyboard, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import Modal from "react-native-modal"
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import Icon from 'react-native-vector-icons/Feather'
@@ -169,6 +169,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
   }
 
   const handleNavigateToView = (item: BeerStyle) => {
+    Keyboard.dismiss()
     navigation.push("view", item)
   }
 
@@ -262,6 +263,7 @@ export const ListScreen: FC<StackScreenProps<NavigatorParamList, "list">> = ({ n
             ListFooterComponentStyle={{
               height: insets.bottom
             }}
+            keyboardShouldPersistTaps={"always"}
           />
           <Modal isVisible={isModalVisible}>
             <SafeAreaView>
