@@ -10,8 +10,6 @@ import { color } from '../theme/color'
 import { uniqueId } from 'lodash'
 import { BeerStyle } from '2021-beer-styles'
 
-console.table(styleNames)
-
 const styleRegex = /^(\d+[A-Z]\.|^Specialty\sIPA:|^Historical\sBeer:)\s([A-Za-z\s]+)/
 
 const SECTION: ViewStyle = {
