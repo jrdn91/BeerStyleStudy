@@ -47,7 +47,6 @@ const beerDataWithSearchString = beerData.map(category => {
     styles: category.styles.map((style: BeerStyle) => {
       const match = style.title.match(styleRegex)
       const nameString = match?.[2]
-      console.log(nameString)
       return {
         ...style,
         searchString: removeAccents(nameString)
@@ -55,8 +54,6 @@ const beerDataWithSearchString = beerData.map(category => {
     })
   }
 })
-
-console.log(beerDataWithSearchString)
 
 interface Section extends BeerCategory {
   type: string
