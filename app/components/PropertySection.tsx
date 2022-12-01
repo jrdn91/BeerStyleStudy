@@ -5,9 +5,10 @@ import { Text } from './text/text'
 import { underscore, humanize } from "inflection"
 import { styleNames } from '../screens/list/list-screen'
 import reactStringReplace from 'react-string-replace';
-import { useNavigation } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import { color } from '../theme/color'
 import { uniqueId } from 'lodash'
+import { BeerStyle } from '2021-beer-styles'
 
 console.table(styleNames)
 
@@ -30,8 +31,9 @@ interface PropertySectionProps {
 const PropertySection = ({ title, content }: PropertySectionProps) => {
   const navigation = useNavigation()
 
-  const handleNavigateToStyle = (style) => {
-    navigation.push('view', { item: style })
+  const handleNavigateToStyle = (style: BeerStyle) => {
+    navigation.dispatch(StackActions.push("view", style))
+    // navigation.push('view', { item: style })
   }
 
   const getContent = () => {
